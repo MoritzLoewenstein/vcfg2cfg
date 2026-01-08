@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { writable } from 'svelte/store';
 	import { vcfgToCfg } from './lib/vcfgConverter';
 
 	let files: File[] = [];
@@ -27,7 +26,7 @@
 		isDragOver = true;
 	}
 
-	function handleDragLeave(e: DragEvent) {
+	function handleDragLeave() {
 		isDragOver = false;
 	}
 
