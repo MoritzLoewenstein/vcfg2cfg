@@ -118,7 +118,7 @@
 		background: #0a0e27;
 		color: #e1e8ed;
 		margin: 0;
-		padding: 20px;
+		padding: 0;
 	}
 
 	main {
@@ -126,6 +126,8 @@
 		justify-content: center;
 		align-items: center;
 		min-height: 100vh;
+		box-sizing: border-box;
+ 		padding: 20px;
 	}
 
 	.container {
