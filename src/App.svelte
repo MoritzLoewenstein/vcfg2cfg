@@ -5,6 +5,7 @@
 	let isDragOver = false;
 	let combinedContent = '';
 	let fileName = 'autoexec.cfg';
+	let fileInput: HTMLInputElement;
 
 	async function convertVcfgFile(vcfgFile: File): Promise<string> {
 		const text = await vcfgFile.text();
@@ -15,10 +16,13 @@
 		e.preventDefault();
 		isDragOver = false;
 
-		files = Array.from(e.dataTransfer?.files ?? []).filter((f) => f.name.endsWith('.vcfg'));
-
-		const parts = await Promise.all(files.map((file) => convertVcfgFile(file)));
-		combinedContent = parts.join('\n\n');
+		const droppedFiles = Array.from(e.dataTransfer?.files ?? []).filter((f) =>
+			f.name.endsWith('.vcfg')
+		);
+		if (droppedFiles.length > 0) {
+			files = droppedFiles;
+			await processFiles(droppedFiles);
+		}
 	}
 
 	function handleDragOver(e: DragEvent) {
@@ -48,6 +52,21 @@
 		files = [];
 		combinedContent = '';
 	}
+
+	async function handleFileInputChange(e: Event) {
+		const input = e.target as HTMLInputElement;
+		const selectedFiles = Array.from(input.files ?? []).filter((f) => f.name.endsWith('.vcfg'));
+		if (selectedFiles.length > 0) {
+			files = selectedFiles;
+			await processFiles(selectedFiles);
+		}
+		input.value = '';
+	}
+
+	async function processFiles(filesToProcess: File[]) {
+		const parts = await Promise.all(filesToProcess.map((file) => convertVcfgFile(file)));
+		combinedContent = parts.join('\n\n');
+	}
 </script>
 
 <main>
@@ -74,12 +93,24 @@
 			</p>
 		</div>
 
+		<input
+			type="file"
+			multiple
+			accept=".vcfg"
+			bind:this={fileInput}
+			onchange={handleFileInputChange}
+			style="display: none;"
+		/>
+
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 		<div
 			class="drop-zone"
 			class:active={isDragOver}
 			ondrop={handleDrop}
 			ondragover={handleDragOver}
 			ondragleave={handleDragLeave}
+			onclick={() => fileInput.click()}
 			role="region"
 			aria-label="File drop zone"
 		>
@@ -127,7 +158,7 @@
 		align-items: center;
 		min-height: 100vh;
 		box-sizing: border-box;
- 		padding: 20px;
+		padding: 20px;
 	}
 
 	.container {
